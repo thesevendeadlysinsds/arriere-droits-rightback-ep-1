@@ -212,19 +212,23 @@ function vague2(&$players, $uas, $limit) {
 
 // --- 1. CONFIGURATION ET CHARGEMENT ---
 $cache_file = 'data_rightbacks.json';
-$players = [];
+$all_players = []; // On utilise un nom clair pour tout le stock
 
-// On regarde si on a déjà les données
+// On charge tout ce qu'on a en cache
 if (file_exists($cache_file)) {
-    $players = json_decode(file_get_contents($cache_file), true);
+    $all_players = json_decode(file_get_contents($cache_file), true);
 }
 
-if (empty($players) || isset($_GET['refresh'])) {
+// CONDITION : On scrape si cache vide, ou refresh forcé, ou si on en veut PLUS que ce qu'on a
+if (empty($all_players) || isset($_GET['refresh']) || ($limit > count($all_players))) {
     $players_map = vague1($limit, $baseUrl, $uas);
     vague2($players_map, $uas, $limit);
-    $players = array_values($players_map);
-    file_put_contents($cache_file, json_encode($players));
+    $all_players = array_values($players_map);
+    file_put_contents($cache_file, json_encode($all_players));
 }
+
+// ICI on applique la limite demandée (pour augmenter ou diminuer l'affichage)
+$players = array_slice($all_players, 0, $limit);
 
 $allowedSorts = ['id', 'name', 'age', 'value_numeric', 'DateOfBirth'];
 $sort = in_array($_GET['sort'] ?? '', $allowedSorts) ? $_GET['sort'] : 'value_numeric';
@@ -409,7 +413,10 @@ $execution_time = round($end_time - $start_time, 2);
 ?>
 
 <p style="text-align:center; color: #666; font-style: italic;">
-    🚀 Page générée en <?= $execution_time ?> secondes. Soit <?= round($execution_time / count($players), 4) ?> secondes par arrière-droit.
+    🚀 Page générée en <?= $execution_time ?> secondes. 
+    <?php if (count($players) > 0): ?>
+        Soit <?= round($execution_time / count($players), 4) ?> secondes par arrière-droit.
+    <?php endif; ?>
 </p>
 
 <table>
@@ -465,4 +472,5 @@ $execution_time = round($end_time - $start_time, 2);
 </body>
 
 </html>
+
 
