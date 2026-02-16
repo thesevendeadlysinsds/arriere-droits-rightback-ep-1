@@ -3,7 +3,7 @@ $start_time = microtime(true);
 set_time_limit(600); // On laisse un peu plus de temps car on va mettre des mini-pauses
 
 // --- CONFIGURATION SAFE ---
-$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 500;
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 25;
 $baseUrl = "https://www.transfermarkt.fr/spieler-statistik/wertvollstespieler/marktwertetop/mw/spielerposition_id/5";
 $uas = [
     // --- WINDOWS (Chrome, Edge, Firefox, Opera) ---
@@ -472,5 +472,6 @@ $execution_time = round($end_time - $start_time, 2);
 </body>
 
 </html>
+
 
 
